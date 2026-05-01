@@ -1,4 +1,4 @@
-# AnalyticsTrack2025
+# AnalyticsTrack2026
 
 Project to conduct the analysis during the Real World Evidence Summer School 2025
 
