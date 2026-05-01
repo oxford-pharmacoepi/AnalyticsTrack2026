@@ -3,6 +3,10 @@ cdm <- omock::mockCdmFromDataset(datasetName = "delphi-100k_5.4")
 con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = here::here("Databases", "delphi.duckdb")))
 DBI::dbExecute(con, "CREATE SCHEMA results")
 CDMConnector::insertCdmTo(cdm = cdm, to = CDMConnector::dbSource(con, "main"))
+DBI::dbRemoveTable(conn = con, name = "genomic_test")
+DBI::dbRemoveTable(conn = con, name = "target_gene")
+DBI::dbRemoveTable(conn = con, name = "variant_annotation")
+DBI::dbRemoveTable(conn = con, name = "variant_occurrence")
 DBI::dbDisconnect(con = con)
 
 cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed")
@@ -10,3 +14,11 @@ con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = here::here("Databases", "G
 DBI::dbExecute(con, "CREATE SCHEMA results")
 CDMConnector::insertCdmTo(cdm = cdm, to = CDMConnector::dbSource(con, "main"))
 DBI::dbDisconnect(con = con)
+
+list.files(path = here::here("Databases"), pattern = "\\.duckdb$") |>
+  purrr::map(\(x) {
+    file.copy(
+      from = here::here("Databases", x), 
+      to = here::here("Databases", "Backup", x)
+    )
+  })
