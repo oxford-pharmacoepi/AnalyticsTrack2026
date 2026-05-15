@@ -15,7 +15,7 @@ library(dplyr)
 library(gt)
 
 # create the database ----
-con <- dbConnect(drv = duckdb(dbdir = here("Database", "TestDatabase.duckdb")))
+con <- dbConnect(drv = duckdb(dbdir = here("Databases", "delphi.duckdb")))
 
 # create the cdm object
 cdm <- cdmFromCon(
@@ -24,7 +24,7 @@ cdm <- cdmFromCon(
   writeSchema = "results",
   achillesSchema = "achilles",
   writePrefix = "rwess_",
-  cdmName = "SummerSchool2025",
+  cdmName = "SummerSchool2026",
   # cohortTables = c("exposures", "pain", "base_cohort") # uncomment if the cohorts have already been created (DAY 3 / DAY 4)
 )
 cdm
