@@ -51,3 +51,4 @@ rsconnect/
 *.duckdb
 *.duckdb.wal
 .DS_Store
+Practical/MyStudy_solutions.R
