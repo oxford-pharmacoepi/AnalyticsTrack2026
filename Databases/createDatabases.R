@@ -1,24 +1,48 @@
 
-cdm <- omock::mockCdmFromDataset(datasetName = "delphi-100k_5.4")
-con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = here::here("Databases", "delphi.duckdb")))
-DBI::dbExecute(con, "CREATE SCHEMA results")
-CDMConnector::insertCdmTo(cdm = cdm, to = CDMConnector::dbSource(con, "main"))
-DBI::dbRemoveTable(conn = con, name = "genomic_test")
-DBI::dbRemoveTable(conn = con, name = "target_gene")
-DBI::dbRemoveTable(conn = con, name = "variant_annotation")
-DBI::dbRemoveTable(conn = con, name = "variant_occurrence")
-DBI::dbDisconnect(con = con)
+path <- file.path(tempdir(), "OMOP")
+dir.create(path = path)
 
-cdm <- omock::mockCdmFromDataset(datasetName = "GiBleed")
-con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = here::here("Databases", "GiBleed.duckdb")))
-DBI::dbExecute(con, "CREATE SCHEMA results")
-CDMConnector::insertCdmTo(cdm = cdm, to = CDMConnector::dbSource(con, "main"))
-DBI::dbDisconnect(con = con)
-
-list.files(path = here::here("Databases"), pattern = "\\.duckdb$") |>
-  purrr::map(\(x) {
-    file.copy(
-      from = here::here("Databases", x), 
-      to = here::here("Databases", "Backup", x)
-    )
+c("delphi" = "delphi-100k_5.4", "GiBleed" = "GiBleed", "synpuf" = "synpuf-1k_5.3") |>
+  purrr::imap(\(x, nm) {
+    options(timeout = 600)
+    omock::downloadMockDataset(datasetName = x, path = path, overwrite = TRUE)
+    
+    datasetPath <- file.path(path, paste0(x, ".zip"))
+    tmpFolder <- file.path(path, "source")
+    dir.create(tmpFolder)
+    
+    cli::cli_inform(c(i = "Unziping DB."))
+    utils::unzip(zipfile = datasetPath, exdir = tmpFolder)
+    
+    print(list.files(tmpFolder, recursive = TRUE))
+    
+    unlink(datasetPath, recursive = TRUE)
+    
+    cli::cli_inform(c(i = "Reading {.pkg {x}} tables."))
+    con <- duckdb::dbConnect(drv = duckdb::duckdb(
+      dbdir = here::here("Databases", paste0(nm, ".duckdb"))
+    ))
+    DBI::dbExecute(con, "CREATE SCHEMA results")
+    DBI::dbExecute(con, "SET memory_limit = '2GB'")
+    list.files(path = tmpFolder, full.names = TRUE, recursive = TRUE) |>
+      purrr::map(\(x) {
+        name <- tools::file_path_sans_ext(x = basename(x))
+        if (!name %in% c("genomic_test", "target_gene", "variant_annotation", "variant_occurrence")) {
+          cli::cli_inform(c(i = "Inserting {.pkg {name}}."))
+          sql <- "CREATE TABLE {name} AS SELECT * FROM read_parquet('{x}')" |>
+            glue::glue() |>
+            as.character()
+          DBI::dbExecute(con, sql)
+        }
+        unlink(x)
+      }) |>
+      invisible()
+    
+    cdm <- CDMConnector::cdmFromCon(con = con, cdmSchema = "main", writeSchema = "results")
+    cdm <- OmopConstructor::buildAchilles(cdm = cdm, achillesId = "minimal")
+    CDMConnector::cdmDisconnect(cdm)
+    
+    unlink(x = tmpFolder, recursive = TRUE)
   })
+
+unlink(path, recursive = TRUE)
