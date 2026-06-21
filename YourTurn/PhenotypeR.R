@@ -13,6 +13,7 @@ cdm <- cdmFromCon(
   con = con,
   cdmSchema = "main",
   writeSchema = "results",
+  achillesSchema = "achilles",
   writePrefix = "ph_"
 )
 

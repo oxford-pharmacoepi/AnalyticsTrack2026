@@ -1,11 +1,13 @@
 
 # load packages ---
+library(PatientProfiles)
+library(CDMConnector)
+library(CohortConstructor)
 library(duckdb)
 library(dplyr)
-library(CDMConnector)
 library(here)
-library(PatientProfiles)
-library(CohortConstructor)
+library(omock)
+library(DBI)
 library(CodelistGenerator)
 
 # connect to database ----

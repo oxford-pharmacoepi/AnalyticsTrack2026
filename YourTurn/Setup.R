@@ -5,5 +5,5 @@ install.packages(c(
   "PatientProfiles", "IncidencePrevalence", "CohortConstructor",
   "DrugUtilisation", "OmopSketch", "visOmopResults", "CohortCharacteristics",
   "usethis", "gt", "shiny", "bslib", "OmopViewer", "omock", "DiagrammeR",
-  "DiagrammeRsvg", "rsvg", "png", "duckdb"
+  "DiagrammeRsvg", "rsvg", "png", "duckdb", "PhenotypeR"
 ))

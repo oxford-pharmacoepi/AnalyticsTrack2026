@@ -23,6 +23,7 @@ c("delphi" = "delphi-100k_5.4", "GiBleed" = "GiBleed", "synpuf" = "synpuf-1k_5.3
       dbdir = here::here("Databases", paste0(nm, ".duckdb"))
     ))
     DBI::dbExecute(con, "CREATE SCHEMA results")
+    DBI::dbExecute(con, "CREATE SCHEMA achilles")
     DBI::dbExecute(con, "SET memory_limit = '2GB'")
     list.files(path = tmpFolder, full.names = TRUE, recursive = TRUE) |>
       purrr::map(\(x) {
@@ -38,7 +39,7 @@ c("delphi" = "delphi-100k_5.4", "GiBleed" = "GiBleed", "synpuf" = "synpuf-1k_5.3
       }) |>
       invisible()
     
-    cdm <- CDMConnector::cdmFromCon(con = con, cdmSchema = "main", writeSchema = "results")
+    cdm <- CDMConnector::cdmFromCon(con = con, cdmSchema = "main", writeSchema = "achilles")
     cdm <- OmopConstructor::buildAchilles(cdm = cdm, achillesId = "minimal")
     CDMConnector::cdmDisconnect(cdm)
     

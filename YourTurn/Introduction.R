@@ -1,9 +1,10 @@
 
 # load packages ---
+library(CDMConnector)
 library(duckdb)
 library(dplyr)
-library(CDMConnector)
 library(here)
+library(omock)
 
 # connect to database ----
 con <- dbConnect(drv = duckdb(dbdir = here("Databases", "delphi.duckdb")))

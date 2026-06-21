@@ -1,10 +1,13 @@
 
 # load packages ---
-library(duckdb)
-library(dplyr)
 library(CDMConnector)
-library(here)
 library(IncidencePrevalence)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gt)
+library(here)
+library(duckdb)
 
 # connect to database ----
 con <- dbConnect(drv = duckdb(dbdir = here("Databases", "delphi.duckdb")))

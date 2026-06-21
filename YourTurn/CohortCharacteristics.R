@@ -1,11 +1,13 @@
 
 # load packages ---
 library(duckdb)
-library(dplyr)
 library(CDMConnector)
+library(CohortConstructor)
+library(PatientProfiles)
+library(dplyr)
+library(ggplot2)
 library(here)
 library(CohortCharacteristics)
-library(CohortConstructor)
 library(CodelistGenerator)
 
 # connect to database ----
